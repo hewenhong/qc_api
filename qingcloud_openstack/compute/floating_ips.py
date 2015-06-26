@@ -25,7 +25,7 @@ import nova.utils
 import qingcloud.iaas
 
 
-conn = qingcloud.iaas.connect_to_zone(                                                               
+conn = qingcloud.iaas.connect_to_zone(
     'gd1',
     'ABPWUVSJGOOZENGPOJSL',
     'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
@@ -95,24 +95,24 @@ class Controller(wsgi.Controller):
         req.cache_db_items('volumes', [volume], 'id')
         return self._view_builder.show(req, volume)
 
-    def delete(self, req, id):
-        """Delete an volume, if allowed.
+    #def delete(self, req, id):
+    #    """Delete an volume, if allowed.
 
-        :param req: `wsgi.Request` object
-        :param id: Image identifier (integer)
-        """
-        context = req.environ['nova.context']
-        try:
-            self._volume_api.delete(context, id)
-        except exception.ImageNotFound:
-            explanation = _("Image not found.")
-            raise webob.exc.HTTPNotFound(explanation=explanation)
-        except exception.ImageNotAuthorized:
-            # The volume service raises this exception on delete if glanceclient
-            # raises HTTPForbidden.
-            explanation = _("You are not allowed to delete the volume.")
-            raise webob.exc.HTTPForbidden(explanation=explanation)
-        return webob.exc.HTTPNoContent()
+    #    :param req: `wsgi.Request` object
+    #    :param id: Image identifier (integer)
+    #    """
+    #    context = req.environ['nova.context']
+    #    try:
+    #        self._volume_api.delete(context, id)
+    #    except exception.ImageNotFound:
+    #        explanation = _("Image not found.")
+    #        raise webob.exc.HTTPNotFound(explanation=explanation)
+    #    except exception.ImageNotAuthorized:
+    #        # The volume service raises this exception on delete if glanceclient
+    #        # raises HTTPForbidden.
+    #        explanation = _("You are not allowed to delete the volume.")
+    #        raise webob.exc.HTTPForbidden(explanation=explanation)
+    #    return webob.exc.HTTPNoContent()
 
     def index(self, req):
         """Return an index listing of volumes available to the request.
@@ -120,8 +120,6 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object
 
         """
-        context = req.environ['nova.context']
-        filters = self._get_filters(req)
         params = req.GET.copy()
         page_params = common.get_pagination_params(req)
         for key, val in page_params.iteritems():
@@ -140,7 +138,6 @@ class Controller(wsgi.Controller):
                 'fixed_ip': '',
                 'pool': "Elastic",
                 'ip': eip['eip_addr']})
-       
 
         return {'floating_ips': res}
 
@@ -150,19 +147,12 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object.
 
         """
-        context = req.environ['nova.context']
-        filters = self._get_filters(req)
-        params = req.GET.copy()
-        page_params = common.get_pagination_params(req)
-        for key, val in page_params.iteritems():
-            params[key] = val
         try:
             volumes = conn.describe_volumes(limit=50)
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
-	data = volumes['volume_set']
-        res = [] 
-        for volume in data:
+        res = []
+        for volume in volumes['volume_set']:
             res.append({
                 'status': volume['status'],
                 'display_name': volume['volume_name'],
@@ -176,7 +166,6 @@ class Controller(wsgi.Controller):
                 'created_at': volume['create_time'],
                 'multiattach': 'false'})
         return {'volumes': res}
-         
 
 
     def create(self, *args, **kwargs):

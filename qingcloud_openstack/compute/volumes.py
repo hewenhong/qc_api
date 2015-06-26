@@ -16,7 +16,6 @@
 import webob.exc
 
 from nova.api.qingcloud_openstack import common
-#from nova.api.qingcloud_openstack.compute.views import volumes as views_volumes
 from nova.api.qingcloud_openstack import wsgi
 from nova import exception
 from nova.i18n import _
@@ -85,16 +84,11 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object
         :param id: Image identifier
         """
-        context = req.environ['nova.context']
+        raise webob.exc.HTTPMethodNotAllowed()
+        #raise webob.exc.HTTPNotFound(explanation=explanation)
 
-        try:
-            volume = self._volume_api.get(context, id)
-        except (exception.NotFound, exception.InvalidImageRef):
-            explanation = _("Image not found.")
-            raise webob.exc.HTTPNotFound(explanation=explanation)
-
-        req.cache_db_items('volumes', [volume], 'id')
-        return self._view_builder.show(req, volume)
+        #req.cache_db_items('volumes', [volume], 'id')
+        #return self._view_builder.show(req, volume)
 
     def delete(self, req, id):
         """Delete an volume, if allowed.

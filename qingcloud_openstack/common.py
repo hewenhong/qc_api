@@ -58,7 +58,7 @@ CONF.import_opt('enable', 'nova.cells.opts', group='cells')
 VALID_NAME_REGEX = re.compile(parameter_types.valid_name_regex, re.UNICODE)
 
 
-XML_NS_V11 = 'http://docs.qingcloud_openstack.org/compute/api/v1.1'
+XML_NS_V11 = 'http://docs.qingcloud.com/'
 
 
 _STATE_MAP = {
@@ -97,7 +97,7 @@ _STATE_MAP = {
         'default': 'VERIFY_RESIZE',
         # Note(maoy): the OS API spec 1.1 doesn't have CONFIRMING_RESIZE
         # state so we comment that out for future reference only.
-        #task_states.RESIZE_CONFIRMING: 'CONFIRMING_RESIZE',
+        # task_states.RESIZE_CONFIRMING: 'CONFIRMING_RESIZE',
         task_states.RESIZE_REVERTING: 'REVERT_RESIZE',
     },
     vm_states.PAUSED: {
@@ -439,9 +439,8 @@ class ViewBuilder(object):
     def _get_links(self, request, identifier, collection_name):
         return [{
             "rel": "self",
-            "href": self._get_href_link(request, identifier, collection_name),
-        },
-        {
+            "href": self._get_href_link(request, identifier, collection_name)},
+            {
             "rel": "bookmark",
             "href": self._get_bookmark_link(request,
                                             identifier,

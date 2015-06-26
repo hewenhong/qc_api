@@ -35,7 +35,7 @@ SUPPORTED_FILTERS = {
     'minDisk': 'min_disk',
 }
 
-conn = qingcloud.iaas.connect_to_zone(                                                               
+conn = qingcloud.iaas.connect_to_zone(
     'gd1',
     'ABPWUVSJGOOZENGPOJSL',
     'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
@@ -78,40 +78,10 @@ class Controller(wsgi.Controller):
         return filters
 
     def show(self, req, id):
-        """Return detailed information about a specific image.
-
-        :param req: `wsgi.Request` object
-        :param id: Image identifier
-        """
-        context = req.environ['nova.context']
-
-        try:
-            image = self._image_api.get(context, id)
-        except (exception.NotFound, exception.InvalidImageRef):
-            explanation = _("Image not found.")
-            raise webob.exc.HTTPNotFound(explanation=explanation)
-
-        req.cache_db_items('images', [image], 'id')
-        return self._view_builder.show(req, image)
+        raise webob.exc.HTTPMethodNotAllowed()
 
     def delete(self, req, id):
-        """Delete an image, if allowed.
-
-        :param req: `wsgi.Request` object
-        :param id: Image identifier (integer)
-        """
-        context = req.environ['nova.context']
-        try:
-            self._image_api.delete(context, id)
-        except exception.ImageNotFound:
-            explanation = _("Image not found.")
-            raise webob.exc.HTTPNotFound(explanation=explanation)
-        except exception.ImageNotAuthorized:
-            # The image service raises this exception on delete if glanceclient
-            # raises HTTPForbidden.
-            explanation = _("You are not allowed to delete the image.")
-            raise webob.exc.HTTPForbidden(explanation=explanation)
-        return webob.exc.HTTPNoContent()
+        raise webob.exc.HTTPMethodNotAllowed()
 
     def index(self, req):
         """Return an index listing of images available to the request.
@@ -119,22 +89,14 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object
 
         """
-        context = req.environ['nova.context']
-        filters = self._get_filters(req)
-        params = req.GET.copy()
         page_params = common.get_pagination_params(req)
-        for key, val in page_params.iteritems():
-            params[key] = val
         data = []
 
         try:
             images = conn.describe_images(
-                provider="selected", status=["available"], **page_params) 
-            #images = self._image_api.get_all(context, filters=filters,
-            #                                 **page_params)
+                provider="selected", status=["available"], **page_params)
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
-        #return self._view_builder.index(req, images)
         for image in images['image_set']:
             data.append({
                 'status': image.get('status', None),
@@ -148,29 +110,20 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object.
 
         """
-        context = req.environ['nova.context']
-        filters = self._get_filters(req)
-        params = req.GET.copy()
         page_params = common.get_pagination_params(req)
-        for key, val in page_params.iteritems():
-            params[key] = val
         data = []
         try:
-            #images = self._image_api.get_all(context, filters=filters,
-            #                                 **page_params)
             images = conn.describe_images(
-                provider="system", status=["pending","available","suspended"], **page_params) 
+                provider="system", status=["pending","available","suspended"], **page_params)
             for image in images['image_set']:
                 data.append({
                     'status': image.get('status', None),
                     'name': image.get('image_name', None),
                     'id': image.get('image_id', None)})
-                
+
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
 
-        #req.cache_db_items('images', images, 'id')
-        #return self._view_builder.detail(req, images)
         return {'images': data}
 
     def create(self, *args, **kwargs):

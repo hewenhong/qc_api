@@ -132,11 +132,8 @@ class ExtensionsController(wsgi.Resource):
 
 
 class ExtensionManager(object):
-    """Load extensions from the configured extension path.
-
-    See nova/tests/api/qingcloud_openstack/compute/extensions/foxinsocks.py or an
-    example extension implementation.
-
+    """
+    Load extensions from the configured extension path.
     """
     def sorted_extensions(self):
         if self.sorted_ext_list is None:
@@ -491,7 +488,8 @@ def expected_errors(errors):
                     raise
 
                 LOG.exception(_LE("Unexpected exception in API method"))
-                msg = _('Unexpected API Error. Please report this at '
+                msg = _(
+                    'Unexpected API Error. Please report this at '
                     'http://bugs.launchpad.net/nova/ and attach the Nova '
                     'API log if possible.\n%s') % type(exc)
                 raise webob.exc.HTTPInternalServerError(explanation=msg)

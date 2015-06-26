@@ -24,7 +24,6 @@ from oslo_log import log as logging
 import oslo_messaging as messaging
 from oslo_utils import netutils
 from oslo_utils import strutils
-from oslo_utils import timeutils
 from oslo_utils import uuidutils
 import six
 import webob
@@ -163,7 +162,9 @@ class Controller(wsgi.Controller):
         #    sort_keys, sort_dirs = common.get_sort_params(req.params)
 
         try:
-            instance_list = conn.describe_instances(limit=limit, status=["pending","running","stopped","suspended"])
+            instance_list = conn.describe_instances(
+                    limit=limit,
+                    status=["pending","running","stopped","suspended"])
             #instance_list = self.compute_api.get_all(context,
             #                                         search_opts=search_opts,
             #                                         limit=limit,
