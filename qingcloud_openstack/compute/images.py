@@ -50,32 +50,32 @@ class Controller(wsgi.Controller):
         super(Controller, self).__init__(**kwargs)
         self._image_api = nova.image.API()
 
-    def _get_filters(self, req):
-        """Return a dictionary of query param filters from the request.
+    #def _get_filters(self, req):
+    #    """Return a dictionary of query param filters from the request.
 
-        :param req: the Request object coming from the wsgi layer
-        :retval a dict of key/value filters
-        """
-        filters = {}
-        for param in req.params:
-            if param in SUPPORTED_FILTERS or param.startswith('property-'):
-                # map filter name or carry through if property-*
-                filter_name = SUPPORTED_FILTERS.get(param, param)
-                filters[filter_name] = req.params.get(param)
+    #    :param req: the Request object coming from the wsgi layer
+    #    :retval a dict of key/value filters
+    #    """
+    #    filters = {}
+    #    for param in req.params:
+    #        if param in SUPPORTED_FILTERS or param.startswith('property-'):
+    #            # map filter name or carry through if property-*
+    #            filter_name = SUPPORTED_FILTERS.get(param, param)
+    #            filters[filter_name] = req.params.get(param)
 
-        # ensure server filter is the instance uuid
-        filter_name = 'property-instance_uuid'
-        try:
-            filters[filter_name] = filters[filter_name].rsplit('/', 1)[1]
-        except (AttributeError, IndexError, KeyError):
-            pass
+    #    # ensure server filter is the instance uuid
+    #    filter_name = 'property-instance_uuid'
+    #    try:
+    #        filters[filter_name] = filters[filter_name].rsplit('/', 1)[1]
+    #    except (AttributeError, IndexError, KeyError):
+    #        pass
 
-        filter_name = 'status'
-        if filter_name in filters:
-            # The Image API expects us to use lowercase strings for status
-            filters[filter_name] = filters[filter_name].lower()
+    #    filter_name = 'status'
+    #    if filter_name in filters:
+    #        # The Image API expects us to use lowercase strings for status
+    #        filters[filter_name] = filters[filter_name].lower()
 
-        return filters
+    #    return filters
 
     def show(self, req, id):
         raise webob.exc.HTTPMethodNotAllowed()
@@ -84,25 +84,7 @@ class Controller(wsgi.Controller):
         raise webob.exc.HTTPMethodNotAllowed()
 
     def index(self, req):
-        """Return an index listing of images available to the request.
-
-        :param req: `wsgi.Request` object
-
-        """
-        page_params = common.get_pagination_params(req)
-        data = []
-
-        try:
-            images = conn.describe_images(
-                provider="selected", status=["available"], **page_params)
-        except exception.Invalid as e:
-            raise webob.exc.HTTPBadRequest(explanation=e.format_message())
-        for image in images['image_set']:
-            data.append({
-                'status': image.get('status', None),
-                'name': image.get('image_id', None),
-                'id': image.get('image_id', None)})
-        return {'images': data}
+        raise webob.exc.HTTPMethodNotAllowed()
 
     def detail(self, req):
         """Return a detailed index listing of images available to the request.

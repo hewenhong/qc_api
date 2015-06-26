@@ -84,35 +84,10 @@ class Controller(wsgi.Controller):
         :param req: `wsgi.Request` object
         :param id: Image identifier
         """
-        context = req.environ['nova.context']
+        raise webob.exc.HTTPMethodNotAllowed()
 
-        try:
-            volume = self._volume_api.get(context, id)
-        except (exception.NotFound, exception.InvalidImageRef):
-            explanation = _("Image not found.")
-            raise webob.exc.HTTPNotFound(explanation=explanation)
-
-        req.cache_db_items('volumes', [volume], 'id')
-        return self._view_builder.show(req, volume)
-
-    #def delete(self, req, id):
-    #    """Delete an volume, if allowed.
-
-    #    :param req: `wsgi.Request` object
-    #    :param id: Image identifier (integer)
-    #    """
-    #    context = req.environ['nova.context']
-    #    try:
-    #        self._volume_api.delete(context, id)
-    #    except exception.ImageNotFound:
-    #        explanation = _("Image not found.")
-    #        raise webob.exc.HTTPNotFound(explanation=explanation)
-    #    except exception.ImageNotAuthorized:
-    #        # The volume service raises this exception on delete if glanceclient
-    #        # raises HTTPForbidden.
-    #        explanation = _("You are not allowed to delete the volume.")
-    #        raise webob.exc.HTTPForbidden(explanation=explanation)
-    #    return webob.exc.HTTPNoContent()
+    def delete(self, req, id):
+        raise webob.exc.HTTPMethodNotAllowed()
 
     def index(self, req):
         """Return an index listing of volumes available to the request.
