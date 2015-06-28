@@ -1,0 +1,72 @@
+Metadata-Version: 1.1
+Name: qingcloud-openstack
+Version: 0.0.1.dev4
+Summary: QingCloud API For OpenStack
+Home-page: http://www.qingcloud.com/
+Author: Vincent He
+Author-email: vincent@yunify.com
+License: UNKNOWN
+Description: ==============================
+        openstack_auth.multi_regions
+        ==============================
+        *宝德云多区域切换库 (http://console.plcloud.com)*
+        
+        依赖
+        -----------
+        1. django_openstack_auth >= 1.1.4
+        
+        
+        配置方法
+        ------------
+        
+        1. 修改openstack_dashboard/urls.py文件, 替换auth url
+        
+        ::
+        
+          - url(r'^auth/', include('openstack_auth.urls'))
+          + url(r'^auth/', include('openstack_auth.multi_regions.urls'))
+        
+        
+        2. 修改openstack_dashboard/settings.py文件, 添加multi_regions app
+        
+        ::
+        
+          INSTALLED_APPS = (
+              '''
+              'openstack_auth.multi_regions',
+              '''
+          )
+        
+        
+        3. 配置local_settings.py, 添加MULTI_REGIONS
+        
+        ::
+        
+          from openstack_auth.multi_regions import i18n as mt_i18n
+          '''
+          MULTI_REGIONS = [
+              ('http://10.0.0.1:5000/v2.0', 'beijing', 'BeiJing-1(PEK-1)'),
+              ('http://172.16.0.1:5000/v2.0', 'shenzhen', 'ShenZhen-1(SZX-1)'),
+              ('http://192.168.100.1:5000/v2.0', 'lab-test', 'Lab-Test-1(Lab-1)'),
+          ]
+          MULTI_REGIONS = mt_i18n(MULTI_REGIONS)
+          OPENSTACK_KEYSTONE_URL = MULTI_REGIONS[0][0]
+        
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: OpenStack
+Classifier: # Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Topic :: Internet :: WWW/HTTP
