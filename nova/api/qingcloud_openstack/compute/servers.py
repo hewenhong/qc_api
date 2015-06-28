@@ -15,18 +15,13 @@
 #    under the License.
 import collections
 import base64
-#import os
 import re
 import sys
 
 from oslo_config import cfg
 from oslo_log import log as logging
 import oslo_messaging as messaging
-from oslo_utils import netutils
-#from oslo_utils import strutils
-#from oslo_utils import uuidutils
 import six
-#import webob
 from webob import exc
 import qingcloud.iaas
 
@@ -48,60 +43,60 @@ conn = qingcloud.iaas.connect_to_zone(
     'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
 )
 
-server_opts = [
-    cfg.BoolOpt('enable_instance_password',
-                default=True,
-                help='Enables returning of the instance password by the'
-                     ' relevant server API calls such as create, rebuild'
-                     ' or rescue, If the hypervisor does not support'
-                     ' password injection then the password returned will'
-                     ' not be correct'),
-]
+#server_opts = [
+#    cfg.BoolOpt('enable_instance_password',
+#                default=True,
+#                help='Enables returning of the instance password by the'
+#                     ' relevant server API calls such as create, rebuild'
+#                     ' or rescue, If the hypervisor does not support'
+#                     ' password injection then the password returned will'
+#                     ' not be correct'),
+#]
 CONF = cfg.CONF
-CONF.register_opts(server_opts)
-CONF.import_opt('network_api_class', 'nova.network')
-CONF.import_opt('reclaim_instance_interval', 'nova.compute.manager')
+#CONF.register_opts(server_opts)
+#CONF.import_opt('network_api_class', 'nova.network')
+#CONF.import_opt('reclaim_instance_interval', 'nova.compute.manager')
 
 LOG = logging.getLogger(__name__)
 
-CREATE_EXCEPTIONS = {
-    exception.InvalidMetadataSize: exc.HTTPRequestEntityTooLarge,
-    exception.ImageNotFound: exc.HTTPBadRequest,
-    exception.FlavorNotFound: exc.HTTPBadRequest,
-    exception.KeypairNotFound: exc.HTTPBadRequest,
-    exception.ConfigDriveInvalidValue: exc.HTTPBadRequest,
-    exception.ImageNotActive: exc.HTTPBadRequest,
-    exception.FlavorDiskTooSmall: exc.HTTPBadRequest,
-    exception.FlavorMemoryTooSmall: exc.HTTPBadRequest,
-    exception.NetworkNotFound: exc.HTTPBadRequest,
-    exception.PortNotFound: exc.HTTPBadRequest,
-    exception.FixedIpAlreadyInUse: exc.HTTPBadRequest,
-    exception.SecurityGroupNotFound: exc.HTTPBadRequest,
-    exception.InstanceUserDataTooLarge: exc.HTTPBadRequest,
-    exception.InstanceUserDataMalformed: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyIncomplete: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyForbidden: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyAsymmetric: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyCPUOutOfRange: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyCPUDuplicates: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyCPUsUnassigned: exc.HTTPBadRequest,
-    exception.ImageNUMATopologyMemoryOutOfRange: exc.HTTPBadRequest,
-    exception.PortInUse: exc.HTTPConflict,
-    exception.InstanceExists: exc.HTTPConflict,
-    exception.NoUniqueMatch: exc.HTTPConflict,
-    exception.Invalid: exc.HTTPBadRequest,
-}
+#CREATE_EXCEPTIONS = {
+#    exception.InvalidMetadataSize: exc.HTTPRequestEntityTooLarge,
+#    exception.ImageNotFound: exc.HTTPBadRequest,
+#    exception.FlavorNotFound: exc.HTTPBadRequest,
+#    exception.KeypairNotFound: exc.HTTPBadRequest,
+#    exception.ConfigDriveInvalidValue: exc.HTTPBadRequest,
+#    exception.ImageNotActive: exc.HTTPBadRequest,
+#    exception.FlavorDiskTooSmall: exc.HTTPBadRequest,
+#    exception.FlavorMemoryTooSmall: exc.HTTPBadRequest,
+#    exception.NetworkNotFound: exc.HTTPBadRequest,
+#    exception.PortNotFound: exc.HTTPBadRequest,
+#    exception.FixedIpAlreadyInUse: exc.HTTPBadRequest,
+#    exception.SecurityGroupNotFound: exc.HTTPBadRequest,
+#    exception.InstanceUserDataTooLarge: exc.HTTPBadRequest,
+#    exception.InstanceUserDataMalformed: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyIncomplete: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyForbidden: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyAsymmetric: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyCPUOutOfRange: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyCPUDuplicates: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyCPUsUnassigned: exc.HTTPBadRequest,
+#    exception.ImageNUMATopologyMemoryOutOfRange: exc.HTTPBadRequest,
+#    exception.PortInUse: exc.HTTPConflict,
+#    exception.InstanceExists: exc.HTTPConflict,
+#    exception.NoUniqueMatch: exc.HTTPConflict,
+#    exception.Invalid: exc.HTTPBadRequest,
+#}
 
-CREATE_EXCEPTIONS_MSGS = {
-    exception.ImageNotFound: _("Can not find requested image"),
-    exception.FlavorNotFound: _("Invalid flavorRef provided."),
-    exception.KeypairNotFound: _("Invalid key_name provided."),
-    exception.ConfigDriveInvalidValue: _("Invalid config_drive provided."),
-}
+#CREATE_EXCEPTIONS_MSGS = {
+#    exception.ImageNotFound: _("Can not find requested image"),
+#    exception.FlavorNotFound: _("Invalid flavorRef provided."),
+#    exception.KeypairNotFound: _("Invalid key_name provided."),
+#    exception.ConfigDriveInvalidValue: _("Invalid config_drive provided."),
+#}
 
 
 class Controller(wsgi.Controller):
-    """The Server API base controller class for the OpenStack API."""
+    """The Server API base controller class Qingcloud for the OpenStack API."""
 
     _view_builder_class = views_servers.ViewBuilder
 
@@ -151,17 +146,11 @@ class Controller(wsgi.Controller):
             instance_list = conn.describe_instances(
                     limit=limit,
                     status=["pending","running","stopped","suspended"])
-            #instance_list = self.compute_api.get_all(context,
-            #                                         search_opts=search_opts,
-            #                                         limit=limit,
-            #                                         marker=marker,
-            #                                        want_objects=True,
-            #                                         sort_keys=sort_keys,
-            #                                         sort_dirs=sort_dirs)
             data = instance_list['instance_set']
             res =[]
             for instance in xrange(instance_list.get('total_count', 0)):
-                if search_filter_name == data[instance].get('instance_name') or search_filter_name == data[instance].get('instance_id'):
+                if search_filter_name == data[instance].get('instance_name') or \
+                        search_filter_name == data[instance].get('instance_id'):
                     res = [{
                               "id": data[instance].get('instance_id'),
                               "name": data[instance].get('instance_id'),
@@ -169,28 +158,26 @@ class Controller(wsgi.Controller):
                     break
                 else:
                     try:
-                       eip_addr = collections.OrderedDict([(u'Elastic IP', [{'version': 4, 'addr': data[instance]['eip']['eip_addr']}])])
+                        eip_addr = collections.OrderedDict([(u'Elastic IP', [{'version': 4, 'addr': data[instance]['eip']['eip_addr']}])])
                     except:
-                       eip_addr = ''
-                    res.append(
-                        {
-                            "id": data[instance].get('instance_id'),
-                            "name": data[instance].get('instance_name'),
-                            "status": data[instance].get('status'),
-                            "tenant_id": "",
-                            "user_id": "",
-                            "metadata": {},
-                            "hostId": "",
-                            "image": data[instance]['image']['image_id'],
-                            "flavor": "",
-                            "created": data[instance]['create_time'],
-                            "updated": data[instance]['status_time'],
-                            "addresses": eip_addr,
-                            "accessIPv4": '',
-                            "accessIPv6": '',
-                            "links": ""
-                        }
-        )
+                        eip_addr = ''
+                    res.append({
+                                "id": data[instance].get('instance_id'),
+                                "name": data[instance].get('instance_name'),
+                                "status": data[instance].get('status'),
+                                "tenant_id": "",
+                                "user_id": "",
+                                "metadata": {},
+                                "hostId": "",
+                                "image": data[instance]['image']['image_id'],
+                                "flavor": "",
+                                "created": data[instance]['create_time'],
+                                "updated": data[instance]['status_time'],
+                                "addresses": eip_addr,
+                                "accessIPv4": '',
+                                "accessIPv6": '',
+                                "links": ""
+                            })
 
         except exception.MarkerNotFound:
             msg = _('marker [%s] not found') % marker
@@ -198,13 +185,13 @@ class Controller(wsgi.Controller):
 
         return {'servers': res}
 
-    def _get_server(self, context, req, instance_uuid):
-        """Utility function for looking up an instance by uuid."""
-        instance = common.get_instance(self.compute_api, context,
-                                       instance_uuid,
-                                       expected_attrs=['flavor'])
-        req.cache_db_instance(instance)
-        return instance
+    #def _get_server(self, context, req, instance_uuid):
+    #    """Utility function for looking up an instance by uuid."""
+    #    instance = common.get_instance(self.compute_api, context,
+    #                                   instance_uuid,
+    #                                   expected_attrs=['flavor'])
+    #    req.cache_db_instance(instance)
+    #    return instance
 
     def _check_string_length(self, value, name, max_length=None):
         try:
@@ -218,97 +205,6 @@ class Controller(wsgi.Controller):
     def _validate_server_name(self, value):
         self._check_string_length(value, 'Server name', max_length=255)
 
-    #def _get_injected_files(self, personality):
-    #    """Create a list of injected files from the personality attribute.
-
-    #    At this time, injected_files must be formatted as a list of
-    #    (file_path, file_content) pairs for compatibility with the
-    #    underlying compute service.
-    #    """
-    #    injected_files = []
-
-    #    for item in personality:
-    #        try:
-    #            path = item['path']
-    #            contents = item['contents']
-    #        except KeyError as key:
-    #            expl = _('Bad personality format: missing %s') % key
-    #            raise exc.HTTPBadRequest(explanation=expl)
-    #        except TypeError:
-    #            expl = _('Bad personality format')
-    #            raise exc.HTTPBadRequest(explanation=expl)
-    #        if self._decode_base64(contents) is None:
-    #            expl = _('Personality content for %s cannot be decoded') % path
-    #            raise exc.HTTPBadRequest(explanation=expl)
-    #        injected_files.append((path, contents))
-    #    return injected_files
-
-    #def _get_requested_networks(self, requested_networks):
-    #    """Create a list of requested networks from the networks attribute."""
-    #    networks = []
-    #    network_uuids = []
-    #    for network in requested_networks:
-    #        request = objects.NetworkRequest()
-    #        try:
-    #            try:
-    #                request.port_id = network.get('port', None)
-    #            except ValueError:
-    #                msg = _("Bad port format: port uuid is "
-    #                        "not in proper format "
-    #                        "(%s)") % network.get('port')
-    #                raise exc.HTTPBadRequest(explanation=msg)
-    #            if request.port_id:
-    #                request.network_id = None
-    #                if not utils.is_neutron():
-    #                    # port parameter is only for neutron v2.0
-    #                    msg = _("Unknown argument : port")
-    #                    raise exc.HTTPBadRequest(explanation=msg)
-    #            else:
-    #                request.network_id = network['uuid']
-
-    #            if (not request.port_id and not
-    #                    uuidutils.is_uuid_like(request.network_id)):
-    #                br_uuid = request.network_id.split('-', 1)[-1]
-    #                if not uuidutils.is_uuid_like(br_uuid):
-    #                    msg = _("Bad networks format: network uuid is "
-    #                            "not in proper format "
-    #                            "(%s)") % request.network_id
-    #                    raise exc.HTTPBadRequest(explanation=msg)
-
-    #            # fixed IP address is optional
-    #            # if the fixed IP address is not provided then
-    #            # it will use one of the available IP address from the network
-    #            try:
-    #                request.address = network.get('fixed_ip', None)
-    #            except ValueError:
-    #                msg = _("Invalid fixed IP address (%s)") % request.address
-    #                raise exc.HTTPBadRequest(explanation=msg)
-
-    #            # duplicate networks are allowed only for neutron v2.0
-    #            if (not utils.is_neutron() and request.network_id and
-    #                    request.network_id in network_uuids):
-    #                expl = (_("Duplicate networks"
-    #                          " (%s) are not allowed") %
-    #                        request.network_id)
-    #                raise exc.HTTPBadRequest(explanation=expl)
-    #            network_uuids.append(request.network_id)
-    #            networks.append(request)
-    #        except KeyError as key:
-    #            expl = _('Bad network format: missing %s') % key
-    #            raise exc.HTTPBadRequest(explanation=expl)
-    #        except TypeError:
-    #            expl = _('Bad networks format')
-    #            raise exc.HTTPBadRequest(explanation=expl)
-
-    #    return objects.NetworkRequestList(objects=networks)
-
-    ## NOTE(vish): Without this regex, b64decode will happily
-    ##             ignore illegal bytes in the base64 encoded
-    ##             data.
-    #B64_REGEX = re.compile('^(?:[A-Za-z0-9+\/]{4})*'
-    #                       '(?:[A-Za-z0-9+\/]{2}=='
-    #                       '|[A-Za-z0-9+\/]{3}=)?$')
-
     def _decode_base64(self, data):
         data = re.sub(r'\s', '', data)
         if not self.B64_REGEX.match(data):
@@ -317,16 +213,6 @@ class Controller(wsgi.Controller):
             return base64.b64decode(data)
         except TypeError:
             return None
-
-    #def _validate_access_ipv4(self, address):
-    #    if not netutils.is_valid_ipv4(address):
-    #        expl = _('accessIPv4 is not proper IPv4 format')
-    #        raise exc.HTTPBadRequest(explanation=expl)
-
-    #def _validate_access_ipv6(self, address):
-    #    if not netutils.is_valid_ipv6(address):
-    #        expl = _('accessIPv6 is not proper IPv6 format')
-    #        raise exc.HTTPBadRequest(explanation=expl)
 
     def show(self, req, id):
         """Returns server details by server id."""

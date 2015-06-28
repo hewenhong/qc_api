@@ -16,10 +16,8 @@
 import webob.exc
 
 from nova.api.qingcloud_openstack import common
-#from nova.api.qingcloud_openstack.compute.views import volumes as views_volumes
 from nova.api.qingcloud_openstack import wsgi
 from nova import exception
-from nova.i18n import _
 import nova.volume
 import nova.utils
 import qingcloud.iaas
@@ -31,16 +29,6 @@ conn = qingcloud.iaas.connect_to_zone(
     'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
 )
 
-SUPPORTED_FILTERS = {
-    'name': 'name',
-    'status': 'status',
-    'changes-since': 'changes-since',
-    'server': 'property-instance_uuid',
-    'type': 'property-volume_type',
-    'minRam': 'min_ram',
-    'minDisk': 'min_disk',
-}
-
 
 class Controller(wsgi.Controller):
     """Base controller for retrieving/displaying volumes."""
@@ -50,33 +38,6 @@ class Controller(wsgi.Controller):
     def __init__(self, **kwargs):
         super(Controller, self).__init__(**kwargs)
         self._volume_api = nova.volume.API()
-
-    def _get_filters(self, req):
-        """Return a dictionary of query param filters from the request.
-
-        :param req: the Request object coming from the wsgi layer
-        :retval a dict of key/value filters
-        """
-        filters = {}
-        for param in req.params:
-            if param in SUPPORTED_FILTERS or param.startswith('property-'):
-                # map filter name or carry through if property-*
-                filter_name = SUPPORTED_FILTERS.get(param, param)
-                filters[filter_name] = req.params.get(param)
-
-        # ensure server filter is the instance uuid
-        filter_name = 'property-instance_uuid'
-        try:
-            filters[filter_name] = filters[filter_name].rsplit('/', 1)[1]
-        except (AttributeError, IndexError, KeyError):
-            pass
-
-        filter_name = 'status'
-        if filter_name in filters:
-            # The Image API expects us to use lowercase strings for status
-            filters[filter_name] = filters[filter_name].lower()
-
-        return filters
 
     def show(self, req, id):
         """Return detailed information about a specific volume.

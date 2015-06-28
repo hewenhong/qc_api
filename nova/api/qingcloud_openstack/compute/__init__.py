@@ -21,26 +21,20 @@ WSGI middleware for OpenStack Compute API.
 from oslo_config import cfg
 
 import nova.api.qingcloud_openstack
-#from nova.api.qingcloud_openstack.compute import consoles
 from nova.api.qingcloud_openstack.compute import extensions
 from nova.api.qingcloud_openstack.compute import flavors
-#from nova.api.qingcloud_openstack.compute import image_metadata
 from nova.api.qingcloud_openstack.compute import images
 from nova.api.qingcloud_openstack.compute import volumes
-#from nova.api.qingcloud_openstack.compute import ips
 from nova.api.qingcloud_openstack.compute import floating_ips
-#from nova.api.qingcloud_openstack.compute import limits
-#from nova.api.qingcloud_openstack.compute import plugins
-#from nova.api.qingcloud_openstack.compute import server_metadata
 from nova.api.qingcloud_openstack.compute import servers
 from nova.api.qingcloud_openstack.compute import versions
 
-allow_instance_snapshots_opt = cfg.BoolOpt('allow_instance_snapshots',
-        default=True,
-        help='Permit instance snapshot operations.')
-
+#allow_instance_snapshots_opt = cfg.BoolOpt('allow_instance_snapshots',
+#        default=True,
+#        help='Permit instance snapshot operations.')
+#
 CONF = cfg.CONF
-CONF.register_opt(allow_instance_snapshots_opt)
+#CONF.register_opt(allow_instance_snapshots_opt)
 
 
 class APIRouter(nova.api.qingcloud_openstack.APIRouter):

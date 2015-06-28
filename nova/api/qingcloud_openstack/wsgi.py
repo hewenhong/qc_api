@@ -560,9 +560,6 @@ class Resource(wsgi.Application):
         """
 
         self.controller = controller
-        print "#################################"
-        print self.controller
-        print "#################################"
 
         default_deserializers = dict(json=JSONDeserializer)
         default_deserializers.update(deserializers)
@@ -776,9 +773,6 @@ class Resource(wsgi.Application):
             return Fault(webob.exc.HTTPBadRequest(explanation=msg))
 
         if body:
-            print "**********************************"
-            print meth
-            print "**********************************"
             msg = _("Action: '%(action)s', calling method: %(meth)s, body: "
                     "%(body)s") % {'action': action,
                                    'body': unicode(body, 'utf-8'),
