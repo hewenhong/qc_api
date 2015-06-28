@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-"""Starter script for Nova EC2 API."""
+"""Starter script for Nova QingCloud API."""
 
 import sys
 

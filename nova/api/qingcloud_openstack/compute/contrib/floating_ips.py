@@ -23,15 +23,13 @@ from nova.api.qingcloud_openstack import common
 from nova.api.qingcloud_openstack import extensions
 from nova.api.qingcloud_openstack import wsgi
 from nova import compute
-from nova.compute import utils as compute_utils
 from nova import exception
 from nova.i18n import _
-from nova.i18n import _LW
 from nova import network
 import qingcloud.iaas
 
 
-conn = qingcloud.iaas.connect_to_zone(                                                               
+conn = qingcloud.iaas.connect_to_zone(
     'gd1',
     'ABPWUVSJGOOZENGPOJSL',
     'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'

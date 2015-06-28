@@ -1,31 +1,30 @@
-# coding:utf-8
+#!/usr/bin/env python
+# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import sys
+# THIS FILE IS MANAGED BY THE GLOBAL REQUIREMENTS REPO - DO NOT EDIT
+import setuptools
+
+# In python < 2.7.4, a lazy loading of package `pbr` will break
+# setuptools if some other modules registered functions in `atexit`.
+# solution from: http://bugs.python.org/issue15881#msg170215
 try:
-    from setuptools import setup
+    import multiprocessing  # noqa
 except ImportError:
-    from distutils.core import setup
+    pass
 
-if sys.version_info < (2, 6):
-    error = 'ERROR: qingcloud-sdk requires Python Version 2.6 or above.'
-    print >> sys.stderr, error
-    sys.exit(1)
-
-
-setup(
-    name = 'qingcloud-openstack',
-    version = '0.1.0',
-    description = 'QingCloud API for Openstack.',
-    long_description = open('README.rst', 'rb').read().decode('utf-8'),
-    keywords = 'qingcloud for openstack api',
-    author = 'Yunify Team',
-    author_email = 'vincent@yunify.com',
-    url = 'https://www.qingcloud.com',
-    packages = ['qingcloud', 'qingcloud.conn', 'qingcloud.iaas', 'qingcloud.misc'],
-    package_dir = {'qingcloud-sdk': 'qingcloud'},
-    namespace_packages = ['qingcloud'],
-    include_package_data = True,
-    install_requires = [
-        'PyYAML>=3.1',
-    ]
-)
+setuptools.setup(
+    setup_requires=['pbr'],
+    pbr=True)
