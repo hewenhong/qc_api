@@ -1,1 +1,1 @@
-# qc_api
+# Qingcloud API For Openstack
