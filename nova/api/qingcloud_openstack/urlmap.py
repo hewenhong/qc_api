@@ -1,17 +1,18 @@
-# Copyright 2011 OpenStack Foundation
-# All Rights Reserved.
+# =========================================================================
+# Copyright 2012-present Yunify, Inc.
+# -------------------------------------------------------------------------
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this work except in compliance with the License.
+# You may obtain a copy of the License in the LICENSE file, or at:
 #
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =========================================================================
 
 import re
 import urllib2
@@ -26,8 +27,8 @@ LOG = logging.getLogger(__name__)
 
 
 _quoted_string_re = r'"[^"\\]*(?:\\.[^"\\]*)*"'
-_option_header_piece_re = re.compile(r';\s*([^\s;=]+|%s)\s*'
-                                     r'(?:=\s*([^;]+|%s))?\s*' %
+_option_header_piece_re = re.compile(
+    r';\s*([^\s;=]+|%s)\s*' r'(?:=\s*([^;]+|%s))?\s*' %
     (_quoted_string_re, _quoted_string_re))
 
 
@@ -163,8 +164,7 @@ class URLMap(paste.urlmap.URLMap):
         for (domain, app_url), app in self.applications:
             if domain and domain != host and domain != host + ':' + port:
                 continue
-            if (path_info == app_url
-                    or path_info.startswith(app_url + '/')):
+            if (path_info == app_url or path_info.startswith(app_url + '/')):
                 return app, app_url
 
         return None, None

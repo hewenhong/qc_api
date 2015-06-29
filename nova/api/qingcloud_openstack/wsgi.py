@@ -1,18 +1,18 @@
-# Copyright 2013 IBM Corp.
-# Copyright 2011 OpenStack Foundation
-# All Rights Reserved.
+# =========================================================================
+# Copyright 2012-present Yunify, Inc.
+# -------------------------------------------------------------------------
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this work except in compliance with the License.
+# You may obtain a copy of the License in the LICENSE file, or at:
 #
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =========================================================================
 
 import functools
 import inspect
@@ -651,8 +651,9 @@ class Resource(wsgi.Application):
         except (KeyError, TypeError):
             raise exception.InvalidContentType(content_type=content_type)
 
-        if (hasattr(deserializer, 'want_controller')
-                and deserializer.want_controller):
+        if (hasattr(
+                deserializer,
+                'want_controller') and deserializer.want_controller):
             return deserializer(self.controller).deserialize(body)
         else:
             return deserializer().deserialize(body)
@@ -752,8 +753,9 @@ class Resource(wsgi.Application):
         #            function.  If we try to audit __call__(), we can
         #            run into troubles due to the @webob.dec.wsgify()
         #            decorator.
-        return self._process_stack(request, action, action_args,
-                               content_type, body, accept)
+        return self._process_stack(
+                request, action, action_args,
+                content_type, body, accept)
 
     def _process_stack(self, request, action, action_args,
                        content_type, body, accept):
@@ -843,7 +845,7 @@ class Resource(wsgi.Application):
                 resp_obj.preserialize(accept, self.default_serializers)
 
                 # Process post-processing extensions
-                #response = self.post_process_extensions(post, resp_obj,
+                # response = self.post_process_extensions(post, resp_obj,
                 #                                        request, action_args)
 
             if resp_obj and not response:
@@ -1064,7 +1066,7 @@ class Controller(object):
             return object.__getattribute__(self, key)
 
         if version_meth_dict and \
-          key in object.__getattribute__(self, VER_METHOD_ATTR):
+                key in object.__getattribute__(self, VER_METHOD_ATTR):
             return version_select
 
         return object.__getattribute__(self, key)
@@ -1179,7 +1181,7 @@ class Fault(webob.exc.HTTPException):
             self.wrapped_exc.headers[API_VERSION_REQUEST_HEADER] = \
                 req.api_version_request.get_string()
             self.wrapped_exc.headers['Vary'] = \
-              API_VERSION_REQUEST_HEADER
+                API_VERSION_REQUEST_HEADER
 
         content_type = req.best_match_content_type()
         serializer = {
