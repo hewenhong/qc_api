@@ -14,30 +14,22 @@
 #    under the License.
 
 import webob.exc
-import qingcloud.iaas
 
 from nova.api.qingcloud_openstack import common
-from nova.api.qingcloud_openstack.compute.views import images as views_images
 from nova.api.qingcloud_openstack import wsgi
+from nova.api.qingcloud_openstack import qingcloud_api
 from nova import exception
-import nova.image
-import nova.utils
 
 
-conn = qingcloud.iaas.connect_to_zone(
-    'gd1',
-    'ABPWUVSJGOOZENGPOJSL',
-    'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
-)
 
 class Controller(wsgi.Controller):
     """Base controller for retrieving/displaying images."""
 
-    _view_builder_class = views_images.ViewBuilder
+    #_view_builder_class = views_images.ViewBuilder
 
     def __init__(self, **kwargs):
         super(Controller, self).__init__(**kwargs)
-        self._image_api = nova.image.API()
+        self.conn = qingcloud_api.conn()
 
     def show(self, req, id):
         raise webob.exc.HTTPMethodNotAllowed()
@@ -46,6 +38,29 @@ class Controller(wsgi.Controller):
         raise webob.exc.HTTPMethodNotAllowed()
 
     def index(self, req):
+        """Return an index listing of images available to the request.
+
+        :param req: `wsgi.Request` object
+
+        """
+        params = req.GET.copy()
+        page_params = common.get_pagination_params(req)
+        for key, val in page_params.iteritems():
+            params[key] = val
+        data = []
+
+        try:
+            images = self.conn.describe_images(
+                provider="selected", status=["available"], **page_params)
+        except exception.Invalid as e:
+            raise webob.exc.HTTPBadRequest(explanation=e.format_message())
+        for image in images['image_set']:
+            data.append({
+                'status': image.get('status', None),
+                'name': image.get('image_id', None),
+                'id': image.get('image_id', None)})
+        return {'images': data}
+
         raise webob.exc.HTTPMethodNotAllowed()
 
     def detail(self, req):
@@ -57,7 +72,7 @@ class Controller(wsgi.Controller):
         page_params = common.get_pagination_params(req)
         data = []
         try:
-            images = conn.describe_images(
+            images = self.conn.describe_images(
                 provider="system", status=["pending","available","suspended"], **page_params)
             for image in images['image_set']:
                 data.append({

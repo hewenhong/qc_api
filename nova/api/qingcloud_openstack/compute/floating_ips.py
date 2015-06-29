@@ -17,17 +17,8 @@ import webob.exc
 
 from nova.api.qingcloud_openstack import common
 from nova.api.qingcloud_openstack import wsgi
+from nova.api.qingcloud_openstack import qingcloud_api
 from nova import exception
-import nova.volume
-import nova.utils
-import qingcloud.iaas
-
-
-conn = qingcloud.iaas.connect_to_zone(
-    'gd1',
-    'ABPWUVSJGOOZENGPOJSL',
-    'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
-)
 
 
 class Controller(wsgi.Controller):
@@ -37,7 +28,7 @@ class Controller(wsgi.Controller):
 
     def __init__(self, **kwargs):
         super(Controller, self).__init__(**kwargs)
-        self._volume_api = nova.volume.API()
+        self.conn = qingcloud_api.conn()
 
     def show(self, req, id):
         """Return detailed information about a specific volume.
@@ -61,7 +52,7 @@ class Controller(wsgi.Controller):
         for key, val in page_params.iteritems():
             params[key] = val
         try:
-            eip_list = conn.describe_eips(limit=50, status=["pending","available","associated","suspended"])
+            eip_list = self.conn.describe_eips(limit=50, status=["pending","available","associated","suspended"])
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
         data = eip_list['eip_set']
@@ -84,7 +75,7 @@ class Controller(wsgi.Controller):
 
         """
         try:
-            volumes = conn.describe_volumes(limit=50)
+            volumes = self.conn.describe_volumes(limit=50)
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
         res = []
@@ -106,7 +97,7 @@ class Controller(wsgi.Controller):
 
     def create(self, *args, **kwargs):
         try:
-            eips = conn.allocate_eips(
+            eips = self.conn.allocate_eips(
                 bandwidth=int(kwargs['body'].get('pool', 1)))
         except:
             raise webob.exc.HTTPMethodNotAllowed()

@@ -17,19 +17,14 @@ import webob.exc
 
 from nova.api.qingcloud_openstack import common
 from nova.api.qingcloud_openstack import wsgi
+from nova.api.qingcloud_openstack import qingcloud_api
 from nova import exception
 from nova.i18n import _
 import nova.volume
 import nova.compute
 import nova.utils
-import qingcloud.iaas
 
 
-conn = qingcloud.iaas.connect_to_zone(
-    'gd1',
-    'ABPWUVSJGOOZENGPOJSL',
-    'fMsZTpw0CbXGqdsgwTv6BvdhRFUqpgCQgbdCKS6k'
-)
 
 SUPPORTED_FILTERS = {
     'name': 'name',
@@ -49,7 +44,7 @@ class Controller(wsgi.Controller):
 
     def __init__(self, **kwargs):
         super(Controller, self).__init__(**kwargs)
-        self._volume_api = nova.volume.API()
+        self.conn = qingcloud_api.conn()
 
     def _get_filters(self, req):
         """Return a dictionary of query param filters from the request.
@@ -85,10 +80,7 @@ class Controller(wsgi.Controller):
         :param id: Image identifier
         """
         raise webob.exc.HTTPMethodNotAllowed()
-        #raise webob.exc.HTTPNotFound(explanation=explanation)
 
-        #req.cache_db_items('volumes', [volume], 'id')
-        #return self._view_builder.show(req, volume)
 
     def delete(self, req, id):
         """Delete an volume, if allowed.
@@ -123,7 +115,7 @@ class Controller(wsgi.Controller):
             params[key] = val
 
         try:
-            volumes = conn.describe_volumes(limit=50)
+            volumes = self.conn.describe_volumes(limit=50)
 
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
@@ -145,7 +137,7 @@ class Controller(wsgi.Controller):
         for key, val in page_params.iteritems():
             params[key] = val
         try:
-            volumes = conn.describe_volumes(limit=50, status=["pending","available","in-use","suspended"])
+            volumes = self.conn.describe_volumes(limit=50, status=["pending","available","in-use","suspended"])
         except exception.Invalid as e:
             raise webob.exc.HTTPBadRequest(explanation=e.format_message())
 	data = volumes['volume_set']
