@@ -1,4 +1,3 @@
-# Qingcloud API For Openstack
 # QingCloud API For OpenStack
 
 1. 依赖
